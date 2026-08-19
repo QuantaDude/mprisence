@@ -1880,6 +1880,7 @@ dependencies = [
  "env_logger",
  "figment",
  "futures",
+ "getrandom 0.4.3",
  "handlebars",
  "handlebars_misc_helpers",
  "image",

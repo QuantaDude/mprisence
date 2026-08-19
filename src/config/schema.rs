@@ -89,6 +89,12 @@ const DEFAULT_TEMPLATE_SMALL_TEXT: &str = "{{{player}}}";
 
 const DEFAULT_COVER_FILE_NAMES: [&str; 5] = ["cover", "folder", "front", "album", "art"];
 const DEFAULT_COVER_PROVIDERS: [&str; 2] = ["catbox", "musicbrainz"];
+const DEFAULT_TMDB_ENABLED: bool = true;
+const DEFAULT_TMDB_SELECTION: TmdbSelectionStrategy = TmdbSelectionStrategy::PopularRandom;
+const DEFAULT_TMDB_IMAGE_TYPE: TmdbImageType = TmdbImageType::Poster;
+const DEFAULT_TMDB_TV_IMAGE_TYPE: TmdbTvImageType = TmdbTvImageType::Episode;
+const DEFAULT_TMDB_IMAGE_SIZE: &str = "w500";
+const DEFAULT_TMDB_USE_BEFORE_LOCAL: bool = false;
 const DEFAULT_COVER_LOCAL_SEARCH_DEPTH: usize = 2;
 const DEFAULT_COVER_CACHE_MAX_SIZE_MB: u64 = 32;
 const DEFAULT_COVER_CACHE_MAX_ENTRIES: usize = 1024;
@@ -1646,6 +1652,9 @@ pub struct CoverProviderConfig {
 
     #[serde(default)]
     pub catbox: CatboxConfig,
+
+    #[serde(default)]
+    pub tmdb: TmdbConfig,
 }
 
 fn default_cover_providers() -> Vec<String> {
@@ -1662,6 +1671,81 @@ impl Default for CoverProviderConfig {
             imgbb: ImgBBConfig::default(),
             musicbrainz: MusicbrainzConfig::default(),
             catbox: CatboxConfig::default(),
+            tmdb: TmdbConfig::default(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum TmdbSelectionStrategy {
+    PopularRandom,
+}
+
+fn default_tmdb_selection() -> TmdbSelectionStrategy {
+    DEFAULT_TMDB_SELECTION
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum TmdbImageType {
+    Poster,
+    Backdrop,
+}
+
+fn default_tmdb_image_type() -> TmdbImageType {
+    DEFAULT_TMDB_IMAGE_TYPE
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum TmdbTvImageType {
+    Episode,
+    Season,
+    Series,
+}
+
+fn default_tmdb_tv_image_type() -> TmdbTvImageType {
+    DEFAULT_TMDB_TV_IMAGE_TYPE
+}
+
+fn default_tmdb_enabled() -> bool {
+    DEFAULT_TMDB_ENABLED
+}
+
+fn default_tmdb_image_size() -> String {
+    DEFAULT_TMDB_IMAGE_SIZE.to_string()
+}
+
+fn default_tmdb_use_before_local() -> bool {
+    DEFAULT_TMDB_USE_BEFORE_LOCAL
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TmdbConfig {
+    #[serde(default = "default_tmdb_enabled")]
+    pub enabled: bool,
+    #[serde(default = "default_tmdb_selection")]
+    pub selection: TmdbSelectionStrategy,
+    #[serde(default = "default_tmdb_image_type")]
+    pub image_type: TmdbImageType,
+    #[serde(default = "default_tmdb_tv_image_type")]
+    pub tv_image_type: TmdbTvImageType,
+    #[serde(default = "default_tmdb_image_size")]
+    pub image_size: String,
+    #[serde(default = "default_tmdb_use_before_local")]
+    pub use_before_local: bool,
+}
+
+impl Default for TmdbConfig {
+    fn default() -> Self {
+        Self {
+            enabled: default_tmdb_enabled(),
+            selection: default_tmdb_selection(),
+            image_type: default_tmdb_image_type(),
+            tv_image_type: default_tmdb_tv_image_type(),
+            image_size: default_tmdb_image_size(),
+            use_before_local: default_tmdb_use_before_local(),
         }
     }
 }

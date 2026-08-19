@@ -87,6 +87,16 @@ impl CoverManager {
                         warn!("Skipping ImgBB provider - no API key configured");
                     }
                 }
+                "tmdb" => {
+                    if cover_config.provider.tmdb.enabled {
+                        debug!("Adding TMDB provider");
+                        providers.push(Box::new(providers::tmdb::TmdbProvider::with_config(
+                            cover_config.provider.tmdb.clone(),
+                        )));
+                    } else {
+                        debug!("Skipping TMDB provider - disabled by configuration");
+                    }
+                }
                 "catbox" => {
                     debug!("Adding Catbox provider");
                     providers.push(Box::new(
@@ -371,7 +381,17 @@ impl CoverManager {
             source_for_providers = source.take();
         }
 
-        // 3. Prefer a shared local cover file before opening embedded artwork.
+        // 3. Optionally let metadata-only providers such as TMDB run before local artwork.
+        if self.config.cover_config().provider.tmdb.use_before_local {
+            if let Some(url) = self
+                .try_providers(None, metadata_source, read_cache, cancel)
+                .await?
+            {
+                return Ok(Some(url));
+            }
+        }
+
+        // 4. Prefer a shared local cover file before opening embedded artwork.
         if let Some(path) = metadata_source.local_file_path() {
             if let Some(parent) = path.parent() {
                 debug!("Attempting to find local cover art in: {:?}", parent);
@@ -399,7 +419,7 @@ impl CoverManager {
             }
         }
 
-        // 4. Try an explicit MPRIS source or bytes recovered from cache.
+        // 5. Try an explicit MPRIS source or bytes recovered from cache.
         if source_for_providers.is_some() {
             if let Some(url) = self
                 .try_providers(
@@ -414,7 +434,7 @@ impl CoverManager {
             }
         }
 
-        // 5. Embedded artwork is the expensive fallback. It is parsed only after
+        // 6. Embedded artwork is the expensive fallback. It is parsed only after
         // direct, cached, and shared local sources have failed.
         if let Some(embedded_art) = self.load_embedded_art(metadata_source, cancel).await? {
             return self
@@ -422,14 +442,9 @@ impl CoverManager {
                 .await;
         }
 
-        // 6. Providers such as MusicBrainz can still resolve artwork from tags.
-        if source_for_providers.is_none() {
-            return self
-                .try_providers(None, metadata_source, read_cache, cancel)
-                .await;
-        }
-
-        Ok(None)
+        // 7. Providers such as MusicBrainz/TMDB can still resolve artwork from tags.
+        self.try_providers(None, metadata_source, read_cache, cancel)
+            .await
     }
 
     async fn load_embedded_art(

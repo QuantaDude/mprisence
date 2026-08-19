@@ -10,6 +10,7 @@ use crate::metadata::MetadataSource;
 pub mod catbox;
 pub mod imgbb;
 pub mod musicbrainz;
+pub mod tmdb;
 
 const USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),

@@ -34,6 +34,14 @@ ttl_hours = 24
 [cover.provider]
 provider = ["catbox", "musicbrainz"]
 
+[cover.provider.tmdb]
+enabled = true
+selection = "popular_random"
+image_type = "poster"
+tv_image_type = "episode"
+image_size = "w500"
+use_before_local = false
+
 [cover.provider.imgbb]
 expiration = 86400
 
