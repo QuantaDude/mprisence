@@ -68,8 +68,6 @@ struct ImagesResponse {
     posters: Vec<TmdbImage>,
     #[serde(default)]
     backdrops: Vec<TmdbImage>,
-    #[serde(default)]
-    stills: Vec<TmdbImage>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -269,7 +267,7 @@ impl TmdbProvider {
                     let (path, kind) = match mode {
                         TmdbTvImageType::Episode => (
                             format!("/tv/{}/season/{}/episode/{}/images", tv.id, season, episode),
-                            "episode still",
+                            "episode backdrop",
                         ),
                         TmdbTvImageType::Season => (
                             format!("/tv/{}/season/{}/images", tv.id, season),
@@ -285,7 +283,7 @@ impl TmdbProvider {
                         continue;
                     };
                     let list = match mode {
-                        TmdbTvImageType::Episode => images.stills,
+                        TmdbTvImageType::Episode => images.backdrops,
                         _ => images.posters,
                     };
                     if let Some(url) = self.select_url(list)? {
