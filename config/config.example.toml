@@ -169,8 +169,22 @@
 # Cover art providers (in order of preference)
 # "catbox"     - Upload using Catbox (optionally via temp Litterbox)
 # "musicbrainz" - Fetch from MusicBrainz database
+# "tmdb"       - Fetch movie/TV artwork from The Movie Database (TMDB)
 # "imgbb"      - Upload and host on ImgBB
-# provider = ["catbox", "musicbrainz"]
+# provider = ["tmdb", "catbox", "musicbrainz"]
+
+[cover.provider.tmdb]
+# TMDB movie/TV cover art. Requires the TMDB API Read Access Token in
+# TMDB_API_TOKEN (do not put the token in this config file). Get one from
+# https://www.themoviedb.org/settings/api after creating a TMDB account.
+# This product uses the TMDB API but is not endorsed or certified by TMDB.
+# Attribution requirements: https://developer.themoviedb.org/docs/attribution
+# enabled = true
+# selection = "popular_random" # ranked popular/high-voted images, then random among strongest
+# image_type = "poster"       # movie artwork: "poster" or "backdrop"
+# tv_image_type = "episode"   # TV preference: "episode", "season", or "series"
+# image_size = "w500"         # TMDB image CDN size, e.g. "w500" or "original"
+# use_before_local = false     # false keeps local cover files preferred over TMDB
 
 [cover.provider.imgbb]
 # Your ImgBB API key (required to use the imgbb provider).
